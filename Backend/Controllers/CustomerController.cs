@@ -2,6 +2,7 @@ using Backend.Data;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Backend.Controllers;
 
@@ -25,16 +26,18 @@ public class CustomerController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> SaveOrUpdate([FromBody] CustomerRequestDto dto)
     {
+        var adSoyadRegex = new Regex("^[a-zA-ZçÇğĞıİöÖşŞüÜ]+$");
 
         if (string.IsNullOrWhiteSpace(dto.Tckn) || dto.Tckn.Length != 11 || !dto.Tckn.All(char.IsDigit))
             return BadRequest("TCKN 11 haneli ve numerik olmalı.");
 
-        if (string.IsNullOrWhiteSpace(dto.Ad) || dto.Ad.Length > 50)
-            return BadRequest("Ad boş olamaz ve 50 karakteri geçemez.");
+        if (string.IsNullOrWhiteSpace(dto.Ad) || dto.Ad.Length > 50 || !adSoyadRegex.IsMatch(dto.Ad))
+        return BadRequest("Ad sadece harf içermeli ve 50 karakteri geçmemelidir.");
 
-        if (string.IsNullOrWhiteSpace(dto.Soyad) || dto.Soyad.Length > 50)
-            return BadRequest("Soyad boş olamaz ve 50 karakteri geçemez.");
 
+        if (string.IsNullOrWhiteSpace(dto.Soyad) || dto.Soyad.Length > 50 || !adSoyadRegex.IsMatch(dto.Soyad))
+        return BadRequest("Soyad sadece harf içermeli ve 50 karakteri geçmemelidir.");
+        
         if (dto.DogumTarihi >= DateTime.Today)
             return BadRequest("Doğum tarihi bugünden küçük olmalı.");
 
