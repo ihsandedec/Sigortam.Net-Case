@@ -67,15 +67,43 @@ public class CustomerController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(customer);
     }
-    
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
-    {   
+    {
         var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id && x.IsActive == 1);
         if (customer == null)
             return NotFound();
         return Ok(customer);
     }
+    
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string? ad, [FromQuery] string? soyad, [FromQuery] string? tckn)
+    {
+        var query = _context.Customers.Where(x => x.IsActive == 1);
+        
+        if (!string.IsNullOrWhiteSpace(ad))
+            query = query.Where(x => x.Ad.Contains(ad));
+        if (!string.IsNullOrWhiteSpace(soyad))
+            query = query.Where(x => x.Soyad.Contains(soyad));
+        if (!string.IsNullOrWhiteSpace(tckn))
+            query = query.Where(x => x.Tckn.Contains(tckn));
+       
+        var results = await query.ToListAsync();
+        
+        var masked = results.Select(x => new CustomerMaskedDto
+        {
+            
+            Id = x.Id,
+            Tckn = "*******" + x.Tckn.Substring(7, 4),
+            Ad = x.Ad.Length > 2 ? x.Ad.Substring(0, 2) + new string('*', x.Ad.Length - 2) : x.Ad,
+            Soyad = x.Soyad.Length > 2 ? x.Soyad.Substring(0, 2) + new string('*', x.Soyad.Length - 2) : x.Soyad,
+            DogumTarihi = "**/**/" + x.DogumTarihi.Substring(0, 4),
+            IsActive = x.IsActive == 1
+        }).ToList();
+        return Ok(masked);
+    }
+
 }
 
 // DTO
