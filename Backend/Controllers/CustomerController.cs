@@ -15,7 +15,7 @@ public class CustomerController : ControllerBase
     {
         _context = context;
     }
-   
+
     private bool KpsDogrula(string tckn, string ad, string soyad, DateTime dogumTarihi)
     {
         return true;
@@ -65,6 +65,15 @@ public class CustomerController : ControllerBase
         }
 
         await _context.SaveChangesAsync();
+        return Ok(customer);
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {   
+        var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id && x.IsActive == 1);
+        if (customer == null)
+            return NotFound();
         return Ok(customer);
     }
 }
