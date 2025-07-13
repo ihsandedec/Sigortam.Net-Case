@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sigortam.net - Müşteri Yönetimi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sigortam-mavi: #009FE3;
+            --sigortam-turuncu: #FF6600;
+            --sigortam-gri: #F7F9FB;
+            --sigortam-beyaz: #FFFFFF;
+            --sigortam-siyah: #333;
+            --sigortam-font: 'Montserrat', sans-serif;
+        }
+
+        body {
+            font-family: var(--sigortam-font);
+            background-color: var(--sigortam-gri);
+            color: var(--sigortam-siyah);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            background-color: var(--sigortam-beyaz);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 32px 24px;
+        }
+
+        h1 {
+            color: var(--sigortam-mavi);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            margin-top: 0;
+            color: #444;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 6px;
+        }
+
+        .card {
+            background-color: var(--sigortam-beyaz);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 1rem;
+            background-color: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--sigortam-mavi);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 159, 227, 0.2);
+        }
+
+        button {
+            background-color: var(--sigortam-mavi);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 22px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: var(--sigortam-turuncu);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin-top: 14px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #e3fcef;
+            color: #0f634f;
+            border: 1px solid #a1efd3;
+        }
+
+        .alert-error {
+            background-color: #ffefef;
+            color: #8b1e1e;
+            border: 1px solid #f4a5a5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f7fe;
+            color: #036aa6;
+            font-weight: 600;
+        }
+
+        tr:hover td {
+            background-color: #f9f9f9;
+        }
+
+        .form-msg {
+            min-height: 24px;
+            margin-top: 10px;
+        }
+
+        .actions button {
+            padding: 6px 14px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            background-color: var(--sigortam-turuncu);
+            color: #fff;
+        }
+
+        .actions button:hover {
+            background-color: #d35400;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 96vw;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Sigortam.net Müşteri Yönetimi</h1>
+        <div id="alert"></div>
+        <div class="card">
+            <h2>Müşteri Ekle / Güncelle</h2>
+            <form id="customerForm">
+                <label for="tckn">TC Kimlik No</label>
+                <input type="text" id="tckn" maxlength="11" required placeholder="11 haneli TCKN">
+                <label for="ad">Ad</label>
+                <input type="text" id="ad" maxlength="50" required placeholder="Ad">
+                <label for="soyad">Soyad</label>
+                <input type="text" id="soyad" maxlength="50" required placeholder="Soyad">
+                <label for="dogumTarihi">Doğum Tarihi</label>
+                <input type="date" id="dogumTarihi" required>
+                <button type="submit">Kaydet / Güncelle</button>
+            </form>
+            <div id="customerFormMsg" class="form-msg"></div>
+        </div>
+        <div class="card">
+            <h2>Müşteri Bilgisi Getir (ID ile)</h2>
+            <form id="getByIdForm">
+                <label for="getById">Müşteri ID</label>
+                <input type="number" id="getById" min="1" required placeholder="Müşteri ID">
+                <button type="submit">Getir</button>
+            </form>
+            <div id="getByIdMsg" class="form-msg"></div>
+            <div id="getByIdResult" style="margin-top:18px;"></div>
+        </div>
+        <div class="card">
+            <h2>Müşteri Arama</h2>
+            <form id="searchForm">
+                <label for="searchAd">Ad</label>
+                <input type="text" id="searchAd" maxlength="50" placeholder="Ad">
+                <label for="searchSoyad">Soyad</label>
+                <input type="text" id="searchSoyad" maxlength="50" placeholder="Soyad">
+                <label for="searchTckn">TCKN</label>
+                <input type="text" id="searchTckn" maxlength="11" placeholder="TCKN">
+                <button type="submit">Ara</button>
+            </form>
+            <div id="searchResults"></div>
+        </div>
+        <div class="card">
+            <h2>Müşteri Sil</h2>
+            <form id="deleteForm">
+                <label for="deleteId">Müşteri ID</label>
+                <input type="number" id="deleteId" min="1" required placeholder="Müşteri ID">
+                <button type="submit">Sil</button>
+            </form>
+            <div id="deleteMsg" class="form-msg"></div>
+        </div>
+    </div>
+    <style>
+        .form-msg {
+            min-height: 24px;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        // Bildirim fonksiyonu
+
+        const API_BASE_URL = 'http://localhost:5096/api/Customer';
+
+        function showAlert(msg, type = 'success', target = 'alert', duration = 6000) {
+            const alertDiv = document.getElementById(target);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+            setTimeout(() => { alertDiv.innerHTML = ''; }, duration);
+        }
+
+        // Müşteri ekle/güncelle
+        document.getElementById('customerForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const tckn = document.getElementById('tckn').value.trim();
+            const ad = document.getElementById('ad').value.trim();
+            const soyad = document.getElementById('soyad').value.trim();
+            const dogumTarihi = document.getElementById('dogumTarihi').value;
+            if (!/^\d{11}$/.test(tckn)) return showAlert('TCKN 11 haneli ve numerik olmalı.', 'error', 'customerFormMsg');
+            if (!ad || ad.length > 50) return showAlert('Ad boş olamaz ve 50 karakteri geçemez.', 'error', 'customerFormMsg');
+            if (!soyad || soyad.length > 50) return showAlert('Soyad boş olamaz ve 50 karakteri geçemez.', 'error', 'customerFormMsg');
+            if (!dogumTarihi || new Date(dogumTarihi) >= new Date().setHours(0, 0, 0, 0)) return showAlert('Doğum tarihi bugünden küçük olmalı.', 'error', 'customerFormMsg');
+            try {
+                const res = await fetch(`${API_BASE_URL}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tckn, ad, soyad, dogumTarihi })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showAlert('Müşteri başarıyla kaydedildi/güncellendi! (ID: ' + data.id + ')', 'success', 'customerFormMsg');
+                    document.getElementById('customerForm').reset();
+                } else {
+                    const err = await res.text();
+                    showAlert(err, 'error', 'customerFormMsg');
+                }
+            } catch {
+                showAlert('Sunucuya erişilemedi.', 'error', 'customerFormMsg');
+            }
+        };
+
+        // ID ile müşteri getir
+        document.getElementById('getByIdForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('getById').value;
+            if (!id) return;
+            const resultDiv = document.getElementById('getByIdResult');
+            const msgDiv = document.getElementById('getByIdMsg');
+            resultDiv.innerHTML = '';
+            msgDiv.innerHTML = '';
+            try {
+                const res = await fetch(`${API_BASE_URL}/${id}`);
+                if (res.ok) {
+                    const c = await res.json();
+                    resultDiv.innerHTML = `<table><tr><th>ID</th><th>TCKN</th><th>Ad</th><th>Soyad</th><th>Doğum Tarihi</th><th>Aktif</th></tr><tr><td>${c.id}</td><td>${c.tckn}</td><td>${c.ad}</td><td>${c.soyad}</td><td>${c.dogumTarihi}</td><td>${c.isActive == 1 ? 'Evet' : 'Hayır'}</td></tr></table>`;
+                } else {
+                    msgDiv.innerHTML = `<div class='alert alert-error'>Kullanıcı bulunamadı.</div>`;
+                }
+            } catch {
+                msgDiv.innerHTML = `<div class='alert alert-error'>Sunucuya erişilemedi.</div>`;
+            }
+        };
+
+        // Müşteri arama
+        document.getElementById('searchForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const ad = document.getElementById('searchAd').value.trim();
+            const soyad = document.getElementById('searchSoyad').value.trim();
+            const tckn = document.getElementById('searchTckn').value.trim();
+            let url = `${API_BASE_URL}/search?`;
+            if (ad) url += `ad=${encodeURIComponent(ad)}&`;
+            if (soyad) url += `soyad=${encodeURIComponent(soyad)}&`;
+            if (tckn) url += `tckn=${encodeURIComponent(tckn)}`;
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '';
+            try {
+                const res = await fetch(url);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.length === 0) {
+                        resultsDiv.innerHTML = '<b>Kayıt bulunamadı.</b>';
+                    } else {
+                        let html = `<table><thead><tr><th>ID</th><th>TCKN</th><th>Ad</th><th>Soyad</th><th>Doğum Tarihi</th><th>Aktif</th></tr></thead><tbody>`;
+                        data.forEach(c => {
+                            html += `<tr><td>${c.id}</td><td>${c.tckn}</td><td>${c.ad}</td><td>${c.soyad}</td><td>${c.dogumTarihi}</td><td>${c.isActive ? 'Evet' : 'Hayır'}</td></tr>`;
+                        });
+                        html += '</tbody></table>';
+                        resultsDiv.innerHTML = html;
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span class='alert alert-error'>Arama sırasında hata oluştu.</span>`;
+                }
+            } catch {
+                resultsDiv.innerHTML = `<span class='alert alert-error'>Sunucuya erişilemedi.</span>`;
+            }
+        };
+
+        // Müşteri silme
+        document.getElementById('deleteForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('deleteId').value;
+            if (!id) return;
+            const msgDiv = document.getElementById('deleteMsg');
+            msgDiv.innerHTML = '';
+            try {
+                const res = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
+                if (res.status === 204) {
+                    msgDiv.innerHTML = '<div class="alert alert-success">Müşteri başarıyla silindi.</div>';
+                    document.getElementById('deleteForm').reset();
+                } else if (res.status === 404) {
+                    msgDiv.innerHTML = '<div class="alert alert-error">Müşteri bulunamadı.</div>';
+                } else {
+                    msgDiv.innerHTML = '<div class="alert alert-error">Silme işlemi başarısız.</div>';
+                }
+            } catch {
+                msgDiv.innerHTML = '<div class="alert alert-error">Sunucuya erişilemedi.</div>';
+            }
+        };
+    </script>
+</body>
+
+</html>
