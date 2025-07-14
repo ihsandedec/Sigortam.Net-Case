@@ -17,9 +17,42 @@ public class CustomerController : ControllerBase
         _context = context;
     }
 
-    private bool KpsDogrula(string tckn, string ad, string soyad, DateTime dogumTarihi)
+    private async Task<bool> KpsDogrula(string tckn, string ad, string soyad, DateTime dogumTarihi)
     {
-        return true;
+        try
+        {
+            using (var client = new HttpClient())
+            {
+                var dogumYili = dogumTarihi.Year;
+
+                // SOAP XML isteği hazırla
+                var soapXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"">
+                    <soap:Body>
+                        <TCKimlikNoDogrula xmlns=""http://tckimlik.nvi.gov.tr/WS"">
+                            <TCKimlikNo>{tckn}</TCKimlikNo>
+                            <Ad>{ad.ToUpper()}</Ad>
+                            <Soyad>{soyad.ToUpper()}</Soyad>
+                            <DogumYili>{dogumYili}</DogumYili>
+                        </TCKimlikNoDogrula>
+                    </soap:Body>
+                </soap:Envelope>";
+
+                var content = new StringContent(soapXml, System.Text.Encoding.UTF8, "text/xml");
+                content.Headers.Add("SOAPAction", "http://tckimlik.nvi.gov.tr/WS/TCKimlikNoDogrula");
+
+                var response = await client.PostAsync("https://tckimlik.nvi.gov.tr/service/kpspublic.asmx", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Yanıtı kontrol et - basit string arama
+                return responseContent.Contains("<TCKimlikNoDogrulaResult>true</TCKimlikNoDogrulaResult>");
+            }
+        }
+        catch
+        {
+            // Hata durumunda false döndür
+            return false;
+        }
     }
 
 
@@ -32,18 +65,17 @@ public class CustomerController : ControllerBase
             return BadRequest("TCKN 11 haneli ve numerik olmalı.");
 
         if (string.IsNullOrWhiteSpace(dto.Ad) || dto.Ad.Length > 50 || !adSoyadRegex.IsMatch(dto.Ad))
-        return BadRequest("Ad sadece harf içermeli ve 50 karakteri geçmemelidir.");
+            return BadRequest("Ad sadece harf içermeli ve 50 karakteri geçmemelidir.");
 
 
         if (string.IsNullOrWhiteSpace(dto.Soyad) || dto.Soyad.Length > 50 || !adSoyadRegex.IsMatch(dto.Soyad))
-        return BadRequest("Soyad sadece harf içermeli ve 50 karakteri geçmemelidir.");
-        
+            return BadRequest("Soyad sadece harf içermeli ve 50 karakteri geçmemelidir.");
+
         if (dto.DogumTarihi >= DateTime.Today)
             return BadRequest("Doğum tarihi bugünden küçük olmalı.");
 
-        if (!KpsDogrula(dto.Tckn, dto.Ad, dto.Soyad, dto.DogumTarihi))
+        if (!await KpsDogrula(dto.Tckn, dto.Ad, dto.Soyad, dto.DogumTarihi))
             return BadRequest("KPS doğrulaması başarısız.");
-
         var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Tckn == dto.Tckn);
 
         if (customer == null)
@@ -106,7 +138,7 @@ public class CustomerController : ControllerBase
         }).ToList();
         return Ok(masked);
     }
-    
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -137,4 +169,4 @@ public class CustomerMaskedDto
     public string Soyad { get; set; } = null!;
     public string DogumTarihi { get; set; } = null!;
     public bool IsActive { get; set; }
-} 
+}
