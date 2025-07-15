@@ -25,7 +25,7 @@ public class CustomerController : ControllerBase
             {
                 var dogumYili = dogumTarihi.Year;
 
-                // SOAP XML isteği hazırla
+                
                 var soapXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 <soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"">
                     <soap:Body>
@@ -44,13 +44,13 @@ public class CustomerController : ControllerBase
                 var response = await client.PostAsync("https://tckimlik.nvi.gov.tr/service/kpspublic.asmx", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                // Yanıtı kontrol et - basit string arama
+                
                 return responseContent.Contains("<TCKimlikNoDogrulaResult>true</TCKimlikNoDogrulaResult>");
             }
         }
         catch
         {
-            // Hata durumunda false döndür
+            
             return false;
         }
     }
@@ -131,8 +131,8 @@ public class CustomerController : ControllerBase
 
             Id = x.Id,
             Tckn = "*******" + x.Tckn.Substring(7, 4),
-            Ad = x.Ad.Length > 2 ? x.Ad.Substring(0, 2) + new string('*', x.Ad.Length - 2) : x.Ad,
-            Soyad = x.Soyad.Length > 2 ? x.Soyad.Substring(0, 2) + new string('*', x.Soyad.Length - 2) : x.Soyad,
+            Ad = x.Ad.Length > 2 ? x.Ad.Substring(0, 2) + new string('*', 5) : x.Ad,
+            Soyad = x.Soyad.Length > 2 ? x.Soyad.Substring(0, 2) + new string('*', 5) : x.Soyad,
             DogumTarihi = "**/**/" + x.DogumTarihi.Substring(0, 4),
             IsActive = x.IsActive == 1
         }).ToList();
